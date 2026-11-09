@@ -83,16 +83,56 @@ public class Ticket {
     }
 
     public void assignAgent(User assignedAgent) {
-        if (assignedAgent != null && this.assignedAgent == null) {
-            this.assignedAgent = assignedAgent;
-            this.status = TicketStatus.IN_PROGRESS;
+
+        if (assignedAgent == null) {
+            throw new IllegalArgumentException("assignedAgent cannot be null");
         }
+
+        if (this.status == TicketStatus.CLOSED) {
+            throw new IllegalStateException("Can't assign agent to closed ticket");
+        }
+
+        if (this.status == TicketStatus.RESOLVED){
+            throw new IllegalStateException("Can't assign agent to resolved ticket");
+        }
+
+        if (this.assignedAgent != null) {
+            throw new IllegalStateException("Agent is already assigned");
+        }
+
+        this.assignedAgent = assignedAgent;
+        this.status = TicketStatus.IN_PROGRESS;
     }
 
     public void changeStatus(TicketStatus newStatus) {
         if (newStatus == null) {
             throw new IllegalArgumentException("Status can't be null");
         }
+
+        if (this.status == TicketStatus.CLOSED) {
+            throw new IllegalStateException("Status CLOSED can't be changed");
+        }
+
+        if (newStatus == TicketStatus.CLOSED && assignedAgent == null) {
+            throw new IllegalStateException("Status can't be CLOSED without an assigned agent");
+        }
+
+        if (newStatus == TicketStatus.RESOLVED && assignedAgent == null) {
+            throw new IllegalStateException("Status can't be RESOLVED without an assigned agent");
+        }
+
+        if (newStatus == TicketStatus.IN_PROGRESS && assignedAgent == null) {
+            throw new IllegalStateException("Status can't be IN_PROGRESS without an assigned agent");
+        }
+
+        if (newStatus == this.status) {
+            throw new IllegalStateException("Status already is " + newStatus);
+        }
+
+        if (newStatus == TicketStatus.NEW && assignedAgent != null) {
+            throw new IllegalStateException("Status can't be NEW when agent is already assigned");
+        }
+
         this.status = newStatus;
     }
 

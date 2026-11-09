@@ -31,10 +31,18 @@ public class CommentService {
             throw new IllegalArgumentException("Invalid comment");
         }
 
+        if (userId == null) {
+            throw new IllegalArgumentException("user id can't be null");
+        }
+
         User user = userRepository.findById(userId).orElseThrow();
 
         if (!user.isActive()){
             throw new IllegalArgumentException("Inactive user, cannot create comment");
+        }
+
+        if (ticketId == null) {
+            throw new IllegalArgumentException("ticket id can't be null");
         }
 
         Ticket ticket = ticketRepository.findById(ticketId).orElseThrow();
