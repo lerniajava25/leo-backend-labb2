@@ -35,9 +35,10 @@ public class CommentService {
             throw new IllegalArgumentException("user id can't be null");
         }
 
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("user not found"));
 
-        if (!user.isActive()){
+        if (!user.isActive()) {
             throw new IllegalArgumentException("Inactive user, cannot create comment");
         }
 
@@ -45,7 +46,8 @@ public class CommentService {
             throw new IllegalArgumentException("ticket id can't be null");
         }
 
-        Ticket ticket = ticketRepository.findById(ticketId).orElseThrow();
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new IllegalArgumentException("ticket not found"));
 
         if (user.getRole() == UserRole.USER
                 && !user.getId().equals(ticket.getCreatedBy().getId())) {

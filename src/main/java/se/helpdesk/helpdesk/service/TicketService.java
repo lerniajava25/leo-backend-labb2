@@ -25,9 +25,9 @@ public class TicketService {
         return ticketRepository.findAll();
     }
 
-    public Optional<Ticket> getTicketById(Long id){
+    public Optional<Ticket> getTicketById(Long id) {
 
-        if (id == null){
+        if (id == null) {
             throw new IllegalArgumentException("id can't be null");
         }
 
@@ -48,7 +48,8 @@ public class TicketService {
             throw new IllegalArgumentException("userId cannot be null");
         }
 
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("user not found"));
 
         if (user.getRole() != UserRole.USER) {
             throw new IllegalArgumentException("ticket can only be created by user");
@@ -63,15 +64,16 @@ public class TicketService {
 
     public void changeTicketStatus(Long id, TicketStatus ticketStatus) {
 
-        if (id == null){
+        if (id == null) {
             throw new IllegalArgumentException("id cannot be null");
         }
 
-        if (ticketStatus == null){
+        if (ticketStatus == null) {
             throw new IllegalArgumentException("ticketStatus cannot be null");
         }
 
-        Ticket ticket = ticketRepository.findById(id).orElseThrow();
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("ticket not found"));
 
         ticket.changeStatus(ticketStatus);
         ticketRepository.save(ticket);
@@ -87,15 +89,18 @@ public class TicketService {
             throw new IllegalArgumentException("agentId cannot be null");
         }
 
-        Ticket ticket = ticketRepository.findById(ticketId).orElseThrow();
-        User agent =  userRepository.findById(agentId).orElseThrow();
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new IllegalArgumentException("ticket not found"));
+
+        User agent = userRepository.findById(agentId)
+                .orElseThrow(() -> new IllegalArgumentException("agent not found"));
 
         if (agent.getRole() != UserRole.AGENT && agent.getRole() != UserRole.ADMIN) {
-            throw new  IllegalArgumentException("Role has to be AGENT or ADMIN");
+            throw new IllegalArgumentException("Role has to be AGENT or ADMIN");
         }
 
         if (!agent.isActive()) {
-            throw new  IllegalArgumentException("Can't assign agent to inactive user");
+            throw new IllegalArgumentException("Can't assign agent to inactive user");
         }
 
         ticket.assignAgent(agent);
