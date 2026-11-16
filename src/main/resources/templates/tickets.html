@@ -6,5 +6,11 @@
 </head>
 <body>
 <h1 th:text="${pageTitle}">Ärenden</h1>
+<ul>
+    <li th:each="ticket : ${tickets}"
+        th:text="${ticket.title}">
+        Ärendets titel
+    </li>
+</ul>
 </body>
 </html>
