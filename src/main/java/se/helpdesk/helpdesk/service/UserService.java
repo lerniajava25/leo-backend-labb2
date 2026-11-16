@@ -97,4 +97,8 @@ public class UserService {
         user.activate();
         userRepository.save(user);
     }
+
+    public boolean usernameExists(String username) {
+        return userRepository.existsByUsername(username);
+    }
 }
