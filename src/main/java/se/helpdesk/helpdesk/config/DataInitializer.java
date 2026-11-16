@@ -23,6 +23,17 @@ public class DataInitializer {
                 userService.createUser("admin", password, UserRole.ADMIN);
             }
 
+            if (!userService.usernameExists("testuser")) {
+
+                String password = System.getenv("HELPDESK_TEST_USER_PASSWORD");
+
+                if (password == null || password.isBlank()) {
+                    throw new IllegalStateException("HELPDESK_TEST_USER_PASSWORD required");
+                }
+
+                userService.createUser("testuser", password, UserRole.USER);
+            }
+
         };
     }
 }

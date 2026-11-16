@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="sv" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="
+          width=device-width,
+          user-scalable=no,
+          initial-scale=1.0,
+          maximum-scale=1.0,
+          minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>Skapa ärende</title>
+</head>
+<body>
+<h1>Skapa nytt ärende</h1>
+<form th:action="@{/tickets}"
+      th:object="${createTicketRequest}"
+      method="post" >
+    <label for="title">Titel</label>
+    <input
+            type="text"
+            id="title"
+            name="title"
+            required
+            placeholder="Skriv in ärendets titel"
+            th:field="*{title}">
+
+    <p th:if="${#fields.hasErrors('title')}"
+        th:errors="*{title}"></p>
+
+    <label for="description">Beskrivning</label>
+    <textarea
+            th:field="*{description}"
+            id="description"
+            name="description"
+            rows="5"
+            placeholder="Beskriv ditt ärende"
+            required
+    ></textarea>
+
+   <p th:if="${#fields.hasErrors('description')}"
+       th:errors="*{description}"></p>
+
+    <button type="submit">
+        Skicka
+    </button>
+</form>
+
+</body>
+</html>

@@ -101,4 +101,14 @@ public class UserService {
     public boolean usernameExists(String username) {
         return userRepository.existsByUsername(username);
     }
+
+    public User getUserByUsername(String username) {
+
+        if(username == null || username.isBlank()){
+            throw new  IllegalArgumentException("username can't be null or blank");
+        }
+
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("user not found"));
+    }
 }
