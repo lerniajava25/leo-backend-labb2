@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ticket details</title>
+</head>
+<body>
+<h1 th:text="${ticket.title}">Ärende</h1>
+
+<section>
+    <h2>Beskrivning</h2>
+    <p th:text="${ticket.description}">Ärendets beskrivning</p>
+</section>
+
+<section>
+    <h2>Status:</h2>
+    <p th:text="${ticket.status}">Ärendets status</p>
+</section>
+</body>
+</html>

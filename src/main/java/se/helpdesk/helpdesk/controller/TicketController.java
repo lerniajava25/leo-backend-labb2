@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import se.helpdesk.helpdesk.dto.CreateTicketRequest;
 import se.helpdesk.helpdesk.entity.Ticket;
@@ -55,6 +56,19 @@ public class TicketController {
         );
 
         return "new-ticket";
+    }
+
+    @GetMapping("/tickets/{id}")
+    public String showTicketDetails(
+            @PathVariable Long id,
+            Model model
+            ) {
+
+        Ticket ticket = ticketService.getTicketById(id);
+        model.addAttribute("ticket", ticket);
+
+        return "ticket-details";
+
     }
 
     @PostMapping("/tickets")
