@@ -19,5 +19,15 @@
     <h2>Status:</h2>
     <p th:text="${ticket.status}">Ärendets status</p>
 </section>
+
+<section>
+    <h2>Kommentarer</h2>
+    <div th:each="comment : ${comments}">
+        <p th:text="${comment.text}">Kommentar</p>
+    </div>
+    <p th:if="${#lists.isEmpty(comments)}">
+        Inga kommentarer ännu.
+    </p>
+</section>
 </body>
 </html>

@@ -1,5 +1,9 @@
 package se.helpdesk.helpdesk.service;
 
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import se.helpdesk.helpdesk.entity.Comment;
 import se.helpdesk.helpdesk.entity.Ticket;
@@ -9,22 +13,28 @@ import se.helpdesk.helpdesk.repository.CommentRepository;
 import se.helpdesk.helpdesk.repository.TicketRepository;
 import se.helpdesk.helpdesk.repository.UserRepository;
 
+import java.util.List;
+
 @Service
 public class CommentService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final TicketRepository ticketRepository;
+    private final TicketService ticketService;
 
     public CommentService(
             CommentRepository commentRepository,
             UserRepository userRepository,
-            TicketRepository ticketRepository) {
+            TicketRepository ticketRepository,
+            TicketService ticketService) {
 
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
         this.ticketRepository = ticketRepository;
+        this.ticketService = ticketService;
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'AGENT', 'USER')")
     public Comment createComment(String text, Long userId, Long ticketId) {
 
         if (text == null || text.isBlank()) {
@@ -37,6 +47,16 @@ public class CommentService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("user not found"));
+
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+        boolean isSelf = user.getUsername().equals(authentication.getName());
+
+        if (!isSelf) {
+            throw new AccessDeniedException("You are not allowed to create this comment");
+        }
 
         if (!user.isActive()) {
             throw new IllegalArgumentException("Inactive user, cannot create comment");
@@ -56,5 +76,16 @@ public class CommentService {
 
         Comment comment = new Comment(text, user, ticket);
         return commentRepository.save(comment);
+    }
+
+    public List<Comment> getCommentsByTicketId(Long ticketId) {
+
+        if (ticketId == null){
+            throw new IllegalArgumentException("ticket id can't be null");
+        }
+
+        ticketService.getTicketById(ticketId);
+
+        return commentRepository.findByTicketId(ticketId);
     }
 }

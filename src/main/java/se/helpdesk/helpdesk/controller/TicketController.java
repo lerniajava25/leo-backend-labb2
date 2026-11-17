@@ -11,20 +11,30 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import se.helpdesk.helpdesk.dto.CreateTicketRequest;
+import se.helpdesk.helpdesk.entity.Comment;
 import se.helpdesk.helpdesk.entity.Ticket;
 import se.helpdesk.helpdesk.entity.User;
+import se.helpdesk.helpdesk.service.CommentService;
 import se.helpdesk.helpdesk.service.TicketService;
 import se.helpdesk.helpdesk.service.UserService;
+
+import java.util.List;
 
 @Controller
 public class TicketController {
 
     private final TicketService ticketService;
     private final UserService userService;
+    private final CommentService commentService;
 
-    public TicketController(TicketService ticketService, UserService userService) {
+    public TicketController(
+            TicketService ticketService,
+            UserService userService,
+            CommentService commentService) {
+
         this.ticketService = ticketService;
         this.userService = userService;
+        this.commentService = commentService;
     }
 
     @GetMapping("/tickets")
@@ -66,6 +76,9 @@ public class TicketController {
 
         Ticket ticket = ticketService.getTicketById(id);
         model.addAttribute("ticket", ticket);
+
+        List<Comment> comments = commentService.getCommentsByTicketId(id);
+        model.addAttribute("comments", comments);
 
         return "ticket-details";
 
