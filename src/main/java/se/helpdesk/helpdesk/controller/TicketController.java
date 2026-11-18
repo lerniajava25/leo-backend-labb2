@@ -55,6 +55,7 @@ public class TicketController {
 
         model.addAttribute("pageTitle", "Mina ärenden");
         model.addAttribute("tickets", tickets);
+
         return "tickets";
     }
 
@@ -72,7 +73,8 @@ public class TicketController {
     @GetMapping("/tickets/{id}")
     public String showTicketDetails(
             @PathVariable Long id,
-            Model model
+            Model model,
+            Authentication authentication
             ) {
 
         Ticket ticket = ticketService.getTicketById(id);
@@ -83,8 +85,13 @@ public class TicketController {
 
         model.addAttribute("createCommentRequest", new CreateCommentRequest(""));
 
-        return "ticket-details";
+        boolean isStaff = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")
+                        || a.getAuthority().equals("ROLE_AGENT"));
 
+        model.addAttribute("isStaff", isStaff);
+
+        return "ticket-details";
     }
 
     @PostMapping("/tickets")

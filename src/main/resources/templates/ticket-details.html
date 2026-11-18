@@ -37,5 +37,10 @@
         <button type="submit">Skicka kommentar</button>
     </form>
 </section>
+
+<a th:if="${isStaff}"
+   th:href="@{/agent/tickets/{id}/edit(id=${ticket.id})}">
+    Redigera ärende
+</a>
 </body>
 </html>
