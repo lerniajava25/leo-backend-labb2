@@ -28,6 +28,14 @@
     <p th:if="${#lists.isEmpty(comments)}">
         Inga kommentarer ännu.
     </p>
+
+    <form th:action="@{/tickets/{id}/comments(id=${ticket.id})}"
+          th:object="${createCommentRequest}"
+          method="post">
+        <textarea th:field="*{text}" required></textarea>
+        <p th:if="${#fields.hasErrors('text')}" th:errors="*{text}"></p>
+        <button type="submit">Skicka kommentar</button>
+    </form>
 </section>
 </body>
 </html>

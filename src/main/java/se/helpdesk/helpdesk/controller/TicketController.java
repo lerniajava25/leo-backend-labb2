@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import se.helpdesk.helpdesk.dto.CreateCommentRequest;
 import se.helpdesk.helpdesk.dto.CreateTicketRequest;
 import se.helpdesk.helpdesk.entity.Comment;
 import se.helpdesk.helpdesk.entity.Ticket;
@@ -79,6 +80,8 @@ public class TicketController {
 
         List<Comment> comments = commentService.getCommentsByTicketId(id);
         model.addAttribute("comments", comments);
+
+        model.addAttribute("createCommentRequest", new CreateCommentRequest(""));
 
         return "ticket-details";
 
