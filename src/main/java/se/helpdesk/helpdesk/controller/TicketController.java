@@ -53,6 +53,11 @@ public class TicketController {
             tickets = ticketService.getTicketsCreatedByUsername(username);
         }
 
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(authority ->
+                        authority.getAuthority().equals("ROLE_ADMIN"));
+
+        model.addAttribute("isAdmin", isAdmin);
         model.addAttribute("pageTitle", "Mina ärenden");
         model.addAttribute("tickets", tickets);
 

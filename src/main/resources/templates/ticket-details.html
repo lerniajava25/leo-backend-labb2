@@ -10,6 +10,8 @@
 <body>
 <h1 th:text="${ticket.title}">Ärende</h1>
 
+<a th:href="@{/tickets}">Tillbaka till ärenden</a>
+
 <section>
     <h2>Beskrivning</h2>
     <p th:text="${ticket.description}">Ärendets beskrivning</p>

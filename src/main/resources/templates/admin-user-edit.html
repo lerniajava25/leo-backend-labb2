@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Redigera användare</title>
+</head>
+
+<body>
+<h1>Redigera användare</h1>
+
+<p th:if="${errorMessage}"
+   th:text="${errorMessage}"></p>
+
+<p th:text="${user.username}">Användarnamn</p>
+
+<form th:action="@{/admin/users/{id}/edit(id=${user.id})}"
+      th:object="${updateUserRequest}"
+      method="post">
+
+    <select th:field="*{role}">
+        <option value="ADMIN">ADMIN</option>
+        <option value="USER">USER</option>
+        <option value="AGENT">AGENT</option>
+    </select>
+
+    <label for="active">Aktivt konto</label>
+    <input type="checkbox"
+           th:field="*{active}"
+           id="active"
+    >
+
+    <button type="submit">Spara ändringar</button>
+</form>
+</body>
+</html>

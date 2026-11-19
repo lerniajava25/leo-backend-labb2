@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Skapa användare</title>
+</head>
+
+<body>
+<a th:href="@{/admin/users}">Tillbaka till användare</a>
+
+<form th:action="@{/admin/users}" th:object="${createUserRequest}" method="post">
+    <label for="username">Användarnamn</label>
+    <input
+            type="text"
+            th:field="*{username}"
+            id="username"
+            placeholder="Användarnamn"
+            required
+    >
+    <p th:if="${#fields.hasErrors('username')}"
+       th:errors="*{username}"></p>
+
+    <label for="password">Lösenord</label>
+    <input
+            type="password"
+            name ="password"
+            id="password"
+            placeholder="Lösenord"
+            required
+    >
+
+    <p th:if="${#fields.hasErrors('password')}"
+       th:errors="*{password}"></p>
+
+    <label for="role">Roll</label>
+    <select th:field="*{role}" id="role" required>
+        <option value="">Välj roll</option>
+        <option value="USER">USER</option>
+        <option value="ADMIN">ADMIN</option>
+        <option value="AGENT">AGENT</option>
+    </select>
+
+    <p th:if="${#fields.hasErrors('role')}"
+       th:errors="*{role}"></p>
+
+    <button type="submit">Skapa användare</button>
+</form>
+
+</body>
+</html>
