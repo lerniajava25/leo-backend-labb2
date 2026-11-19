@@ -58,7 +58,7 @@ public class TicketController {
                         authority.getAuthority().equals("ROLE_ADMIN"));
 
         model.addAttribute("isAdmin", isAdmin);
-        model.addAttribute("pageTitle", "Mina ärenden");
+        model.addAttribute("pageTitle", "Alla ärenden");
         model.addAttribute("tickets", tickets);
 
         return "tickets";
