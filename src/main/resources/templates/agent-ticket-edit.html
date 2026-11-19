@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Uppdatera ärende</title>
+</head>
+<body>
+<h1 th:text="${ticket.title}">Rubrik</h1>
+
+<section>
+    <div>
+        <h2>Beskrivning:</h2>
+        <p th:text="${ticket.description}">Beskrivning av ärende</p>
+    </div>
+
+    <div>
+        <h2>Status:</h2>
+        <p th:text="${ticket.status}">Ärendets status</p>
+    </div>
+
+    <div>
+        <h2>Agent:</h2>
+
+        <p th:if="${ticket.assignedAgent != null}"
+           th:text="${ticket.assignedAgent.username}"></p>
+
+        <p th:if="${ticket.assignedAgent == null}">
+            Ingen tilldelad agent
+        </p>
+    </div>
+
+    <form th:action="@{/agent/tickets/{id}/status(id=${ticket.id})}" method="post">
+        <select name="status">
+            <option>IN_PROGRESS</option>
+            <option>WAITING_FOR_USER</option>
+            <option>RESOLVED</option>
+            <option>CLOSED</option>
+        </select>
+
+        <button type="submit">Spara status</button>
+    </form>
+
+    <form th:if="${ticket.assignedAgent == null}"
+          th:action="@{/agent/tickets/{id}/assign(id=${ticket.id})}"
+          method="post">
+        <button type="submit">Tilldela mig ärendet</button>
+    </form>
+</section>
+
+<a th:href="@{/tickets/{id}(id=${ticket.id})}">Tillbaka till ärendet</a>
+
+
+</body>
+</html>

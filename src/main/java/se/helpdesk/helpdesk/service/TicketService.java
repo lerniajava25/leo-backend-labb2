@@ -1,5 +1,9 @@
 package se.helpdesk.helpdesk.service;
 
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import se.helpdesk.helpdesk.entity.Ticket;
 import se.helpdesk.helpdesk.entity.User;
@@ -8,6 +12,7 @@ import se.helpdesk.helpdesk.enums.UserRole;
 import se.helpdesk.helpdesk.repository.TicketRepository;
 import se.helpdesk.helpdesk.repository.UserRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,19 +26,46 @@ public class TicketService {
         this.userRepository = userRepository;
     }
 
+    @PreAuthorize("#username == authentication.name")
+    public List<Ticket> getTicketsCreatedByUsername(String username) {
+
+        if (username == null || username.isBlank()){
+            throw new IllegalArgumentException("Username cannot be null or empty");
+        }
+
+        return ticketRepository.findByCreatedByUsername(username);
+    }
+
+    @PreAuthorize("hasAnyRole('AGENT', 'ADMIN')")
     public Iterable<Ticket> getAllTickets() {
         return ticketRepository.findAll();
     }
 
-    public Optional<Ticket> getTicketById(Long id) {
+    public Ticket getTicketById(Long id) {
 
         if (id == null) {
             throw new IllegalArgumentException("id can't be null");
         }
 
-        return ticketRepository.findById(id);
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(()-> new IllegalArgumentException("Ticket with id " + id + " not found"));
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        boolean isOwner = ticket.getCreatedBy().getUsername().equals(authentication.getName());
+
+        boolean isStaff = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")
+                || a.getAuthority().equals("ROLE_AGENT"));
+
+        if (!isOwner && !isStaff) {
+            throw new AccessDeniedException("You are not allowed to access this ticket");
+        }
+
+        return ticket;
     }
 
+    @PreAuthorize("hasRole('USER')")
     public Ticket createTicket(String title, String description, Long userId) {
 
         if (title == null || title.isBlank()) {
@@ -59,9 +91,17 @@ public class TicketService {
             throw new IllegalArgumentException("Ticket can only be created by active users");
         }
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isSelf = user.getUsername().equals(authentication.getName());
+
+        if (!isSelf) {
+            throw new AccessDeniedException("You are not allowed to create this ticket");
+        }
+
         return ticketRepository.save(new Ticket(title, description, user));
     }
 
+    @PreAuthorize("hasAnyRole('AGENT', 'ADMIN')")
     public void changeTicketStatus(Long id, TicketStatus ticketStatus) {
 
         if (id == null) {
@@ -79,6 +119,7 @@ public class TicketService {
         ticketRepository.save(ticket);
     }
 
+    @PreAuthorize("hasAnyRole('AGENT', 'ADMIN')")
     public void assignAgent(Long ticketId, Long agentId) {
 
         if (ticketId == null) {
@@ -101,6 +142,13 @@ public class TicketService {
 
         if (!agent.isActive()) {
             throw new IllegalArgumentException("Can't assign agent to inactive user");
+        }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isSelf = agent.getUsername().equals(authentication.getName());
+
+        if (!isSelf){
+            throw new AccessDeniedException("You are not allowed to change this ticket");
         }
 
         ticket.assignAgent(agent);

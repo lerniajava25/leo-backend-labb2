@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ticket details</title>
+</head>
+<body>
+<h1 th:text="${ticket.title}">Ärende</h1>
+
+<a th:href="@{/tickets}">Tillbaka till ärenden</a>
+
+<section>
+    <h2>Beskrivning</h2>
+    <p th:text="${ticket.description}">Ärendets beskrivning</p>
+</section>
+
+<section>
+    <h2>Status:</h2>
+    <p th:text="${ticket.status}">Ärendets status</p>
+</section>
+
+<section>
+    <h2>Kommentarer</h2>
+    <div th:each="comment : ${comments}">
+        <p th:text="${comment.text}">Kommentar</p>
+    </div>
+    <p th:if="${#lists.isEmpty(comments)}">
+        Inga kommentarer ännu.
+    </p>
+
+    <form th:action="@{/tickets/{id}/comments(id=${ticket.id})}"
+          th:object="${createCommentRequest}"
+          method="post">
+        <textarea th:field="*{text}" required></textarea>
+        <p th:if="${#fields.hasErrors('text')}" th:errors="*{text}"></p>
+        <button type="submit">Skicka kommentar</button>
+    </form>
+</section>
+
+<a th:if="${isStaff}"
+   th:href="@{/agent/tickets/{id}/edit(id=${ticket.id})}">
+    Redigera ärende
+</a>
+</body>
+</html>
