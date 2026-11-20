@@ -1,10 +1,12 @@
 package se.helpdesk.helpdesk.service;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import se.helpdesk.helpdesk.entity.Comment;
 import se.helpdesk.helpdesk.entity.Ticket;
 import se.helpdesk.helpdesk.entity.User;
@@ -67,11 +69,13 @@ public class CommentService {
         }
 
         Ticket ticket = ticketRepository.findById(ticketId)
-                .orElseThrow(() -> new IllegalArgumentException("ticket not found"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Ticket not found"));
 
         if (user.getRole() == UserRole.USER
                 && !user.getId().equals(ticket.getCreatedBy().getId())) {
-            throw new IllegalArgumentException("Invalid user, cannot create comment");
+            throw new AccessDeniedException(
+                    "You are not allowed to comment on this ticket");
         }
 
         Comment comment = new Comment(text, user, ticket);
