@@ -1,11 +1,13 @@
 package se.helpdesk.helpdesk.service;
 
 import jakarta.transaction.Transactional;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import se.helpdesk.helpdesk.entity.User;
 import se.helpdesk.helpdesk.enums.UserRole;
 import se.helpdesk.helpdesk.repository.UserRepository;
@@ -39,7 +41,8 @@ public class UserService {
         }
 
         return getUserById(id)
-                .orElseThrow(() -> new IllegalArgumentException("user id can't be null"));
+                .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "User not found"));
     }
 
     public Iterable<User> getAllUsers() {

@@ -26,6 +26,7 @@ public class SecurityConfig {
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/agent/**").hasAnyRole("AGENT", "ADMIN")
                 .requestMatchers("/tickets", "/tickets/**").authenticated()
+                .requestMatchers("/css/**").permitAll()
                 .anyRequest().denyAll()
         );
 

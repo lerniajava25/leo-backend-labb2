@@ -1,10 +1,12 @@
 package se.helpdesk.helpdesk.service;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import se.helpdesk.helpdesk.entity.Ticket;
 import se.helpdesk.helpdesk.entity.User;
 import se.helpdesk.helpdesk.enums.TicketStatus;
@@ -48,7 +50,9 @@ public class TicketService {
         }
 
         Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(()-> new IllegalArgumentException("Ticket with id " + id + " not found"));
+                .orElseThrow(()-> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Ticket with id " + id + " not found"));
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -113,7 +117,19 @@ public class TicketService {
         }
 
         Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("ticket not found"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Ticket not found"));
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        User assignedAgent = ticket.getAssignedAgent();
+
+        if (assignedAgent == null ||
+                !assignedAgent.getUsername().equals(authentication.getName())) {
+            throw new AccessDeniedException(
+                    "You are not allowed to change this ticket's status");
+        }
 
         ticket.changeStatus(ticketStatus);
         ticketRepository.save(ticket);
@@ -131,10 +147,12 @@ public class TicketService {
         }
 
         Ticket ticket = ticketRepository.findById(ticketId)
-                .orElseThrow(() -> new IllegalArgumentException("ticket not found"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Ticket not found"));
 
         User agent = userRepository.findById(agentId)
-                .orElseThrow(() -> new IllegalArgumentException("agent not found"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Agent not found"));
 
         if (agent.getRole() != UserRole.AGENT && agent.getRole() != UserRole.ADMIN) {
             throw new IllegalArgumentException("Role has to be AGENT or ADMIN");
